@@ -24,8 +24,9 @@ node {
         }
         
         stage("Dynamic node") {
-            sh "conan install ${params.project_id}"
-            
+            docker.image("conanio/gcc8").inside("--net=docker_jenkins_artifactory") {
+                sh "conan install ${params.project_id}"
+            }
         }
 
         state = "success"
