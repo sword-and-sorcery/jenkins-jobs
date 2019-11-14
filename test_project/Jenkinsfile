@@ -1,28 +1,36 @@
 import groovy.json.JsonOutput
 
+def post_status(state) {
+    def context = "conan-ci/projects - ${params.project_id} - ${params.reference}"
+    def description = "description": "Build for '${params.reference}' done!"
+    def target_url = "https://my.url"
+
+    withCredentials([usernamePassword(credentialsId: 'github-user-token', passwordVariable: 'pass', usernameVariable: 'user')]) {
+        def url = "https://api.github.com/repos/${params.organization}/${params.repository}/statuses/${params.sha1}?access_token=$pass"
+        def payload = JsonOutput.toJson(["state": state, "context": context, "description": description, "target_url": target_url])
+        def response = sh(returnStdout: true, script: "curl -v -H \"Accept: application/json\" -H \"Content-type: application/json\" -X POST -d '${payload}' ${url}").trim()
+    }
+}
+
 node {
-    stage('Trigger') {
-        echo "Hello ${params.reference}"
-        echo "Hello ${params.project_id}"
-            
-        withCredentials([usernamePassword(credentialsId: 'github-user-token', passwordVariable: 'pass', usernameVariable: 'user')]) {
-            echo "Hello $user"
-            echo "Hello ${params.organization}"
-            echo "Hello ${params.repository}"
-            echo "Hello ${params.sha1}"
-            
-            def url = "https://api.github.com/repos/${params.organization}/${params.repository}/statuses/${params.sha1}?access_token=$pass"
-            
-            
-            def payload = JsonOutput.toJson(["state": "success", "context": "conan-ci/projects - ${params.project_id} - ${params.reference}", "description": "Build for '${params.reference}' done!", "target_url": "https://my.url"])
-            def response = sh(returnStdout: true, script: "curl -v -H \"Accept: application/json\" -H \"Content-type: application/json\" -X POST -d '${payload}' ${url}").trim()
-                
+    def state = "error"
+
+    try {
+        post_status("pending")
+
+        stage('Trigger') {
+            echo "Building project '${params.project_id}'"
+            echo " - for changes in '${params.reference}'"
         }
-    }
-    
-    stage("Dynamic node") {
         
-        
+        stage("Dynamic node") {
+            
+            
+        }
+
+        state = "success"
     }
-    
+    finally {
+        post_status(state)
+    }    
 }
