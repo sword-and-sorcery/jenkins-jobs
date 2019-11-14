@@ -25,7 +25,14 @@ node {
         
         stage("Dynamic node") {
             docker.image("conanio/gcc8").inside("--net=docker_jenkins_artifactory") {
-                sh "conan install ${params.project_id}"
+                def server = Artifactory.server artifactory_name
+                def client = Artifactory.newConanClient()
+                def remoteName = "artifactory-local"
+
+                client.run(command: "config install -sf conan/config https://github.com/sword-and-sorcery/sword-and-sorcery.git")
+                client.run(command: "config install -sf hooks -tf hooks https://github.com/conan-io/hooks.git")
+                client.remote.add server: server, repo: artifactory_repo, remoteName: remoteName, force: true
+                sh "conan install ${params.project_id} --profile conanio-gcc8"
             }
         }
 
