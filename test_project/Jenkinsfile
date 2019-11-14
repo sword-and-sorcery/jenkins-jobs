@@ -2,7 +2,7 @@ import groovy.json.JsonOutput
 
 def post_status(state) {
     def context = "conan-ci/projects - ${params.project_id} - ${params.reference}"
-    def description = "description": "Build for '${params.reference}' done!"
+    def description = "Build for '${params.reference}' done!"
     def target_url = "https://my.url"
 
     withCredentials([usernamePassword(credentialsId: 'github-user-token', passwordVariable: 'pass', usernameVariable: 'user')]) {
@@ -24,7 +24,7 @@ node {
         }
         
         stage("Dynamic node") {
-            
+            sh "conan install ${params.project_id}"
             
         }
 
