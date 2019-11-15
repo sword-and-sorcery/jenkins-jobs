@@ -24,27 +24,29 @@ node {
         }
         
         stage("Dynamic node") {
-            docker.image("conanio/gcc8").inside("--net=docker_jenkins_artifactory") {
-                def artifactory_name = "Artifactory Docker"
-                def artifactory_repo = "conan-local"
+            docker.image("conanio/gcc8").inside("--net=docker_jenkins_artifactory").withRun('-e "CONAN_USER_HOME=~/tmp"') {
+                withEnv(['CONAN_USER_HOME=${env.WORKSPACE}']) {
+                    def artifactory_name = "Artifactory Docker"
+                    def artifactory_repo = "conan-local"
 
-                def server = Artifactory.server artifactory_name
-                def client = Artifactory.newConanClient()
-                def remoteName = "artifactory-local"
+                    def server = Artifactory.server artifactory_name
+                    def client = Artifactory.newConanClient(userHome: ${env.WORKSPACE})
+                    def remoteName = "artifactory-local"
 
-                String profile = "conanio-gcc8"
-                String lockfile = "conan.lock"
+                    String profile = "conanio-gcc8"
+                    String lockfile = "conan.lock"
 
-                client.run(command: "config install -sf conan/config https://github.com/sword-and-sorcery/sword-and-sorcery.git")
-                client.run(command: "config install -sf hooks -tf hooks https://github.com/conan-io/hooks.git")
-                client.remote.add server: server, repo: artifactory_repo, remoteName: remoteName, force: true
+                    client.run(command: "config install -sf conan/config https://github.com/sword-and-sorcery/sword-and-sorcery.git")
+                    client.run(command: "config install -sf hooks -tf hooks https://github.com/conan-io/hooks.git")
+                    client.remote.add server: server, repo: artifactory_repo, remoteName: remoteName, force: true
 
-                client.run(command: "install ${params.reference} --profile ${profile}".toString())
-                client.run(command: "install ${params.project_id} --profile ${profile}".toString())
+                    client.run(command: "install ${params.reference} --profile ${profile}".toString())
+                    client.run(command: "install ${params.project_id} --profile ${profile}".toString())
 
-                // TODO: Iterate profiles
-                client.run(command: "graph lock --profile ${profile} --lockfile=${lockfile} ${params.project_id}".toString())
-                sh "cat ${lockfile}"
+                    // TODO: Iterate profiles
+                    client.run(command: "graph lock --profile ${profile} --lockfile=${lockfile} ${params.project_id}".toString())
+                    sh "cat ${lockfile}"
+                }
             }
         }
 
