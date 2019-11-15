@@ -35,7 +35,9 @@ node {
                 client.run(command: "config install -sf conan/config https://github.com/sword-and-sorcery/sword-and-sorcery.git")
                 client.run(command: "config install -sf hooks -tf hooks https://github.com/conan-io/hooks.git")
                 client.remote.add server: server, repo: artifactory_repo, remoteName: remoteName, force: true
-                sh "conan install ${params.project_id} --profile conanio-gcc8"
+
+                client.run(command: "install ${params.reference} --profile conanio-gcc8")
+                client.run(command: "install ${params.project_id} --profile conanio-gcc8")
             }
         }
 
