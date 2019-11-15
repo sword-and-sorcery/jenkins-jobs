@@ -30,7 +30,7 @@ node {
                     def artifactory_repo = "conan-local"
 
                     def server = Artifactory.server artifactory_name
-                    def client = Artifactory.newConanClient(userHome: ${env.WORKSPACE})
+                    def client = Artifactory.newConanClient(userHome: "${env.WORKSPACE}")
                     def remoteName = "artifactory-local"
 
                     String profile = "conanio-gcc8"
