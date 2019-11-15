@@ -25,6 +25,9 @@ node {
         
         stage("Dynamic node") {
             docker.image("conanio/gcc8").inside("--net=docker_jenkins_artifactory") {
+                def artifactory_name = "Artifactory Docker"
+                def artifactory_repo = "conan-local"
+
                 def server = Artifactory.server artifactory_name
                 def client = Artifactory.newConanClient()
                 def remoteName = "artifactory-local"
