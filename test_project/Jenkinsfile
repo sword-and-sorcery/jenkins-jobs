@@ -24,7 +24,7 @@ node {
         }
         
         stage("Dynamic node") {
-            docker.image("conanio/gcc8").inside("--net=docker_jenkins_artifactory").withRun('-e "CONAN_USER_HOME=~/tmp"') {
+            docker.image("conanio/gcc8").inside("--net=docker_jenkins_artifactory") {
                 withEnv(['CONAN_USER_HOME=${env.WORKSPACE}']) {
                     def artifactory_name = "Artifactory Docker"
                     def artifactory_repo = "conan-local"
