@@ -46,6 +46,7 @@ node {
                     // TODO: Iterate profiles
                     client.run(command: "graph lock --profile ${profile} --lockfile=${lockfile} ${params.project_id}".toString())
                     sh "cat ${lockfile}"
+                    sh "conan graph build-order ${lockfile} --build=missing".toString()
                 }
             }
         }
