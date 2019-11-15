@@ -39,10 +39,10 @@ node {
                 client.run(command: "config install -sf hooks -tf hooks https://github.com/conan-io/hooks.git")
                 client.remote.add server: server, repo: artifactory_repo, remoteName: remoteName, force: true
 
-                client.run(command: "install ${params.reference} --profile ${profile}")
-                client.run(command: "install ${params.project_id} --profile ${profile}")
+                client.run(command: "install ${params.reference} --profile ${profile}".toString())
+                client.run(command: "install ${params.project_id} --profile ${profile}".toString())
 
-                client.run(command: "graph lock --profile ${profile} --lockfile=${lockfile} ${params.project_id} ")
+                client.run(command: "graph lock --profile ${profile} --lockfile=${lockfile} ${params.project_id}".toString())
                 sh "cat ${lockfile}"
             }
         }
